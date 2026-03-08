@@ -1,9 +1,17 @@
-import { addToCart } from "../../api/cartApi"
+import { addToCart, getCart } from "../../api/cartApi"
 
 function ProductCard({ product }) {
 
   const handleAddToCart = async () => {
+
+    // Add item
     await addToCart(product.id)
+
+    // Fetch updated cart
+    const updatedCart = await getCart()
+
+    console.log("Updated cart:", updatedCart)
+
     alert("Product added to cart")
   }
 
@@ -15,6 +23,7 @@ function ProductCard({ product }) {
       <button onClick={handleAddToCart}>
         Add To Cart
       </button>
+
     </div>
   )
 }

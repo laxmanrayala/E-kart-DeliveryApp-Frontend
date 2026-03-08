@@ -1,12 +1,18 @@
+import Navbar from "./components/layout/Navbar"
 import AppRoutes from "./routes/AppRoutes"
 
 function App() {
+
   return (
     <div>
-      <h1>E-Kart</h1>
+
+      <Navbar />
+
       <AppRoutes />
+
     </div>
   )
+
 }
 
 export default App
