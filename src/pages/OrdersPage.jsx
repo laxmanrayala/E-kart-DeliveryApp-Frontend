@@ -1,9 +1,22 @@
 import { useEffect, useState } from "react"
 import { getOrders } from "../api/orderApi"
+import { useNavigate } from "react-router-dom"
 
 function OrdersPage() {
 
   const [orders, setOrders] = useState([])
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+
+    const token = localStorage.getItem("token")
+
+    if (!token) {
+      navigate("/login")
+    }
+
+  }, [])
 
   useEffect(() => {
     loadOrders()

@@ -8,19 +8,51 @@ function CartPage() {
   const [cart, setCart] = useState(null)
   const navigate = useNavigate()
 
+
+  useEffect(() => {
+
+    const token = localStorage.getItem("token")
+
+    if (!token) {
+      navigate("/login")
+    }
+
+  }, [])
+
   useEffect(() => {
     loadCart()
   }, [])
 
   const loadCart = async () => {
+  try {
+
     const data = await getCart()
     setCart(data)
+
+  } catch (error) {
+
+    if (error.response?.status === 403 || error.response?.status === 401) {
+      navigate("/login")
+    }
+
   }
+}
 
   const handleCheckout = async () => {
+
+  try {
+
     await checkout()
     navigate("/order-success")
+
+  } catch (error) {
+
+    if (error.response?.status === 403 || error.response?.status === 401) {
+      navigate("/login")
+    }
+
   }
+}
 
   // SAFE total calculation
   const total = cart?.items?.reduce(

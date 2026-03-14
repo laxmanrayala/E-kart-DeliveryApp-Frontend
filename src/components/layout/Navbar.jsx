@@ -1,36 +1,70 @@
-import { Link, useLocation } from "react-router-dom"
-import { useEffect, useState } from "react"
-import { getCartCount } from "../../api/cartApi"
+import { Link, useNavigate } from "react-router-dom"
+import { useContext } from "react"
+import { CartContext } from "../../context/CartContext"
 
 function Navbar() {
 
-  const [cartCount, setCartCount] = useState(0)
+  const { cartCount } = useContext(CartContext)
+  const navigate = useNavigate()
 
-  const location = useLocation()
+  const token = localStorage.getItem("token")
+  const role = localStorage.getItem("role")
 
-  useEffect(() => {
-    loadCartCount()
-  }, [location])
+  const logout = () => {
 
-  const loadCartCount = async () => {
-    const count = await getCartCount()
-    setCartCount(count)
+    localStorage.removeItem("token")
+    localStorage.removeItem("userId")
+    localStorage.removeItem("role")
+
+    navigate("/login")
   }
 
   return (
-    <nav style={{display:"flex",justifyContent:"space-between",padding:"15px",background:"#eee"}}>
 
-      <h2>E-Kart</h2>
+    <div className="bg-green-600 text-white p-4 flex justify-between items-center">
 
-      <div>
-        <Link to="/" style={{marginRight:"15px"}}>Home</Link>
-        <Link to="/cart" style={{marginRight:"15px"}}>
-          Cart ({cartCount})
-        </Link>
-        <Link to="/orders">Orders</Link>
+      <Link to="/" className="text-xl font-bold">
+        E-Kart
+      </Link>
+
+      <div className="flex gap-4 items-center">
+
+        <Link to="/">Home</Link>
+
+        {token && (
+          <>
+            <Link to="/orders">Orders</Link>
+            <Link to="/cart">Cart ({cartCount})</Link>
+          </>
+        )}
+
+        {role === "ADMIN" && (
+          <>
+            <Link to="/admin/products">Products</Link>
+            <Link to="/admin/orders">Admin Orders</Link>
+            <Link to="/admin/stores">Stores</Link>
+          </>
+        )}
+
+        {!token && (
+          <>
+            <Link to="/login">Login</Link>
+            <Link to="/register">Register</Link>
+          </>
+        )}
+
+        {token && (
+          <button
+            onClick={logout}
+            className="bg-white text-green-600 px-3 py-1 rounded"
+          >
+            Logout
+          </button>
+        )}
+
       </div>
 
-    </nav>
+    </div>
   )
 }
 
