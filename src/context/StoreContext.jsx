@@ -14,14 +14,42 @@ export function StoreProvider({ children }) {
 
       const res = await axios.get("/stores")
 
-      setStores(res.data)
+      const storeList = res.data
 
-      if (res.data.length > 0 && !selectedStore) {
-        setSelectedStore(res.data[0])
+      setStores(storeList)
+
+      // check if store already saved in localStorage
+      const savedStoreId = localStorage.getItem("selectedStoreId")
+
+      if (savedStoreId) {
+
+        const store = storeList.find(
+          s => s.id === Number(savedStoreId)
+        )
+
+        if (store) {
+          setSelectedStore(store)
+          return
+        }
+
+      }
+
+      // default to first store
+      if (storeList.length > 0) {
+
+        setSelectedStore(storeList[0])
+
+        localStorage.setItem(
+          "selectedStoreId",
+          storeList[0].id
+        )
+
       }
 
     } catch (err) {
+
       console.error("Failed to load stores", err)
+
     }
 
   }
@@ -29,6 +57,20 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     fetchStores()
   }, [])
+
+  // update localStorage whenever store changes
+  useEffect(() => {
+
+    if (selectedStore) {
+
+      localStorage.setItem(
+        "selectedStoreId",
+        selectedStore.id
+      )
+
+    }
+
+  }, [selectedStore])
 
   return (
     <StoreContext.Provider

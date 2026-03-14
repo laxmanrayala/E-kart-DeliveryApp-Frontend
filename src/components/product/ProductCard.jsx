@@ -18,25 +18,38 @@ function ProductCard({ product }) {
 
   return (
 
-    <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col">
+    <div className="bg-white rounded-xl shadow-sm p-3 flex flex-col border border-gray-100 hover:shadow-md transition">
 
-      <img
-        src={`https://source.unsplash.com/200x200/?${product.name}`}
-        alt={product.name}
-        className="h-32 object-contain mb-3"
-      />
+      {/* IMAGE AREA */}
+
+      <div className="bg-gray-100 rounded-lg h-32 flex items-center justify-center mb-3">
+
+        <img
+          src={product.imageUrl || "https://via.placeholder.com/120"}
+          alt={product.name}
+          onError={(e)=>{e.target.src="https://via.placeholder.com/120"}}
+          className="max-h-28 object-contain"
+        />
+
+      </div>
+
+      {/* DELIVERY */}
 
       <span className="text-xs bg-gray-100 px-2 py-1 rounded w-fit mb-2">
         ⏱ 12 MINS
       </span>
 
-      <h3 className="font-semibold text-gray-800">
+      {/* NAME */}
+
+      <h3 className="font-semibold text-sm text-gray-800 line-clamp-2">
         {product.name}
       </h3>
 
-      <p className="text-sm text-gray-500 mb-3">
+      <p className="text-xs text-gray-500 mb-3">
         1 unit
       </p>
+
+      {/* PRICE + BUTTON */}
 
       <div className="flex items-center justify-between mt-auto">
 
@@ -48,7 +61,7 @@ function ProductCard({ product }) {
 
           <button
             onClick={handleAdd}
-            className="bg-green-600 text-white px-4 py-1 rounded-lg text-sm"
+            className="border border-green-600 text-green-600 px-4 py-1 rounded-lg text-sm font-semibold"
           >
             ADD
           </button>
@@ -57,23 +70,11 @@ function ProductCard({ product }) {
 
           <div className="flex items-center bg-green-600 text-white rounded-lg">
 
-            <button
-              onClick={handleReduce}
-              className="px-3 py-1"
-            >
-              -
-            </button>
+            <button onClick={handleReduce} className="px-3 py-1">-</button>
 
-            <span className="px-2">
-              {quantity}
-            </span>
+            <span className="px-2">{quantity}</span>
 
-            <button
-              onClick={handleAdd}
-              className="px-3 py-1"
-            >
-              +
-            </button>
+            <button onClick={handleAdd} className="px-3 py-1">+</button>
 
           </div>
 
@@ -84,6 +85,7 @@ function ProductCard({ product }) {
     </div>
 
   )
+
 }
 
 export default ProductCard

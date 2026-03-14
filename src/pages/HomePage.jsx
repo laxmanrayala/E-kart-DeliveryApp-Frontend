@@ -25,7 +25,9 @@ function HomePage() {
       setProducts(res.data)
 
     } catch (err) {
-      console.error(err)
+
+      console.error("Failed to fetch products", err)
+
     }
 
     setLoading(false)
@@ -33,12 +35,14 @@ function HomePage() {
   }
 
   useEffect(() => {
+
     fetchProducts()
+
   }, [selectedStore])
 
   return (
 
-    <div>
+    <div className="bg-gray-50 min-h-screen">
 
       <HeroBanner />
 
@@ -47,8 +51,10 @@ function HomePage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
 
         <h2 className="text-2xl font-bold mb-6">
-          {selectedStore?.name} Products
+          Ekart {selectedStore?.name} Products
         </h2>
+
+        {/* LOADING STATE */}
 
         {loading ? (
 
@@ -58,7 +64,7 @@ function HomePage() {
 
               <div
                 key={i}
-                className="h-48 bg-gray-200 animate-pulse rounded-xl"
+                className="h-[240px] bg-gray-200 animate-pulse rounded-xl"
               />
 
             ))}
@@ -67,11 +73,23 @@ function HomePage() {
 
         ) : (
 
+          /* PRODUCTS GRID */
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
 
-            {products.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {products.length === 0 ? (
+
+              <p className="text-gray-500">
+                No products available for this store
+              </p>
+
+            ) : (
+
+              products.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))
+
+            )}
 
           </div>
 

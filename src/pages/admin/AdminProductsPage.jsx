@@ -1,25 +1,36 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import axios from "../../api/axiosConfig"
+import { StoreContext } from "../../context/StoreContext"
 
 export default function AdminProductsPage() {
+
+  const { selectedStore } = useContext(StoreContext)
 
   const [products, setProducts] = useState([])
 
   const [name, setName] = useState("")
   const [price, setPrice] = useState("")
   const [stock, setStock] = useState("")
-  const [image, setImage] = useState(null)
+  const [imageUrl, setImageUrl] = useState("")
 
   const fetchProducts = async () => {
 
-    const res = await axios.get("/admin/products")
+    if (!selectedStore) return
+
+    const res = await axios.get(
+      `/admin/products?storeId=${selectedStore.id}`
+    )
 
     setProducts(res.data.content || res.data)
   }
 
   useEffect(() => {
-    fetchProducts()
-  }, [])
+
+    if (selectedStore) {
+      fetchProducts()
+    }
+
+  }, [selectedStore])
 
   const createProduct = async () => {
 
@@ -28,22 +39,18 @@ export default function AdminProductsPage() {
       return
     }
 
-    const formData = new FormData()
-
-    formData.append("name", name)
-    formData.append("price", price)
-    formData.append("stock", stock)
-
-    if (image) {
-      formData.append("image", image)
-    }
-
-    await axios.post("/admin/products", formData)
+    await axios.post("/admin/products", {
+      name,
+      price,
+      stock,
+      imageUrl,
+      storeId: selectedStore.id
+    })
 
     setName("")
     setPrice("")
     setStock("")
-    setImage(null)
+    setImageUrl("")
 
     fetchProducts()
   }
@@ -58,7 +65,7 @@ export default function AdminProductsPage() {
   const increaseStock = async (id) => {
 
     await axios.patch(`/admin/products/${id}/stock`, {
-      quantity: 1
+      change: 1
     })
 
     fetchProducts()
@@ -67,7 +74,7 @@ export default function AdminProductsPage() {
   const decreaseStock = async (id) => {
 
     await axios.patch(`/admin/products/${id}/stock`, {
-      quantity: -1
+      change: -1
     })
 
     fetchProducts()
@@ -80,6 +87,10 @@ export default function AdminProductsPage() {
       <h1 className="text-2xl font-bold mb-6">
         Admin Product Management
       </h1>
+
+      <div className="mb-4 text-gray-600">
+        Store: <b>{selectedStore?.name}</b>
+      </div>
 
       {/* Add Product */}
 
@@ -109,8 +120,10 @@ export default function AdminProductsPage() {
         />
 
         <input
-          type="file"
-          onChange={(e)=>setImage(e.target.files[0])}
+          className="border p-2"
+          placeholder="Image URL"
+          value={imageUrl}
+          onChange={(e)=>setImageUrl(e.target.value)}
         />
 
         <button
