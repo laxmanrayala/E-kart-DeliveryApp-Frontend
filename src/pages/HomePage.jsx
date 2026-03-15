@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from "react"
+import { useLocation } from "react-router-dom"
 import axios from "../api/axiosConfig"
 import ProductCard from "../components/product/ProductCard"
 import HeroBanner from "../components/home/HeroBanner"
@@ -7,99 +8,118 @@ import { StoreContext } from "../context/StoreContext"
 
 function HomePage() {
 
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
+const [products, setProducts] = useState([])
+const [loading, setLoading] = useState(true)
 
-  const { selectedStore } = useContext(StoreContext)
+const [selectedCategory, setSelectedCategory] = useState("All")
 
-  const fetchProducts = async () => {
+const { selectedStore } = useContext(StoreContext)
 
-    if (!selectedStore) return
+const location = useLocation()
+const query = new URLSearchParams(location.search)
+const search = query.get("search")
 
-    setLoading(true)
+const fetchProducts = async () => {
 
-    try {
+if (!selectedStore) return
 
-      const res = await axios.get(`/stores/${selectedStore.id}/products`)
+setLoading(true)
 
-      setProducts(res.data)
+try {
 
-    } catch (err) {
+  const res = await axios.get(`/stores/${selectedStore.id}/products`)
 
-      console.error("Failed to fetch products", err)
+  setProducts(res.data)
 
-    }
+} catch (err) {
 
-    setLoading(false)
+  console.error("Failed to fetch products", err)
 
-  }
+}
 
-  useEffect(() => {
+setLoading(false)
 
-    fetchProducts()
+}
 
-  }, [selectedStore])
+useEffect(() => {
 
-  return (
+fetchProducts()
 
-    <div className="bg-gray-50 min-h-screen">
 
-      <HeroBanner />
+}, [selectedStore])
 
-      <Categories />
+const filteredProducts = products.filter((product) => {
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+const categoryMatch =
+  selectedCategory === "All" || product.category === selectedCategory
 
-        <h2 className="text-2xl font-bold mb-6">
-          Ekart {selectedStore?.name} Products
-        </h2>
+const searchMatch =
+  !search || product.name.toLowerCase().includes(search.toLowerCase())
 
-        {/* LOADING STATE */}
+return categoryMatch && searchMatch
 
-        {loading ? (
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+})
 
-            {[...Array(10)].map((_, i) => (
+return (
 
-              <div
-                key={i}
-                className="h-[240px] bg-gray-200 animate-pulse rounded-xl"
-              />
+<div className="bg-gray-50 min-h-screen">
 
-            ))}
+  <HeroBanner />
 
-          </div>
+  <Categories
+    selectedCategory={selectedCategory}
+    setSelectedCategory={setSelectedCategory}
+  />
+
+  <div className="max-w-7xl mx-auto px-6 py-8">
+
+    <h2 className="text-2xl font-bold mb-6">
+      {selectedStore?.name} Products
+    </h2>
+
+    {loading ? (
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+
+        {[...Array(10)].map((_, i) => (
+
+          <div
+            key={i}
+            className="h-[240px] bg-gray-200 animate-pulse rounded-xl"
+          />
+
+        ))}
+
+      </div>
+
+    ) : (
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+
+        {filteredProducts.length === 0 ? (
+
+          <p className="text-gray-500">
+            No products found
+          </p>
 
         ) : (
 
-          /* PRODUCTS GRID */
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-
-            {products.length === 0 ? (
-
-              <p className="text-gray-500">
-                No products available for this store
-              </p>
-
-            ) : (
-
-              products.map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))
-
-            )}
-
-          </div>
+          filteredProducts.map(product => (
+            <ProductCard key={product.id} product={product} />
+          ))
 
         )}
 
       </div>
 
-    </div>
+    )}
 
-  )
+  </div>
+
+</div>
+
+)
 
 }
 

@@ -6,25 +6,44 @@ import LoginModal from "../auth/LoginModal"
 
 function Navbar() {
 
-  const { cartCount } = useContext(CartContext)
+  const { cartCount, cartTotal } = useContext(CartContext)
   const { stores, selectedStore, setSelectedStore } = useContext(StoreContext)
 
   const [open, setOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
+  const [searchIndex, setSearchIndex] = useState(0)
+  const [search, setSearch] = useState("")
 
   const dropdownRef = useRef(null)
+  const accountRef = useRef(null)
 
   const navigate = useNavigate()
 
   const token = localStorage.getItem("token")
   const role = localStorage.getItem("role")
 
-  const logout = () => {
+  const searchHints = [
+    "chocolates",
+    "cake",
+    "milk",
+    "vegetables",
+    "ice cream",
+    "chips",
+    "bread"
+  ]
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSearchIndex((prev) => (prev + 1) % searchHints.length)
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const logout = () => {
     localStorage.removeItem("token")
     localStorage.removeItem("userId")
     localStorage.removeItem("role")
-
     navigate("/")
     window.location.reload()
   }
@@ -34,15 +53,23 @@ function Navbar() {
     setOpen(false)
   }
 
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && search.trim() !== "") {
+      navigate(`/?search=${search}`)
+      setSearch("")
+    }
+  }
+
   useEffect(() => {
 
     function handleClickOutside(event) {
 
-      if (dropdownRef.current &&
-          !dropdownRef.current.contains(event.target)) {
-
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpen(false)
+      }
 
+      if (accountRef.current && !accountRef.current.contains(event.target)) {
+        setAccountOpen(false)
       }
 
     }
@@ -57,111 +84,190 @@ function Navbar() {
 
   return (
 
-    <div className="bg-green-600 text-white px-6 py-3 flex justify-between items-center">
+    <div className="bg-green-600 text-white sticky top-0 z-50 shadow-md">
 
-      {/* LEFT */}
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-6">
 
-      <div className="flex items-center gap-8">
+        <div className="flex items-center gap-8">
 
-        <Link to="/" className="text-xl font-bold">
-          E-Kart
-        </Link>
+          <Link to="/" className="text-2xl font-bold">
+            E-Kart
+          </Link>
 
-        {selectedStore && (
+          {selectedStore && (
 
-          <div ref={dropdownRef} className="relative">
+            <div ref={dropdownRef} className="relative">
 
-            <div
-              className="cursor-pointer flex flex-col"
-              onClick={() => setOpen(!open)}
-            >
+              <div
+                className="cursor-pointer flex flex-col hover:bg-green-700 px-3 py-1 rounded"
+                onClick={() => setOpen(!open)}
+              >
 
-              <span className="text-sm font-semibold">
-                Delivery in 11 minutes
-              </span>
+                <span className="text-sm font-semibold">
+                  Delivery in 11 minutes
+                </span>
 
-              <span className="flex items-center text-sm gap-1">
+                <span className="flex items-center text-sm gap-1">
+                  📍 {selectedStore.name} ▼
+                </span>
 
-                📍 {selectedStore.name}
+              </div>
 
-                <span className="text-xs">▼</span>
+              {open && (
 
-              </span>
+                <div className="absolute mt-2 w-60 bg-white text-black rounded-xl shadow-xl border">
 
-            </div>
+                  {stores.map(store => (
 
-            <div
-              className={`absolute mt-2 w-56 bg-white text-black rounded shadow-lg transition-all duration-200 origin-top ${
-                open
-                  ? "scale-100 opacity-100"
-                  : "scale-95 opacity-0 pointer-events-none"
-              }`}
-            >
+                    <div
+                      key={store.id}
+                      onClick={() => changeStore(store)}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      {store.name}
+                    </div>
 
-              {stores.map(store => (
-
-                <div
-                  key={store.id}
-                  onClick={() => changeStore(store)}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-
-                  {store.name}
+                  ))}
 
                 </div>
 
-              ))}
+              )}
 
             </div>
 
+          )}
+
+        </div>
+
+        <div className="flex-1 max-w-xl">
+
+          <div className="relative">
+
+            <input
+              type="text"
+              value={search}
+              onChange={(e)=>setSearch(e.target.value)}
+              onKeyDown={handleSearch}
+              placeholder={`Search "${searchHints[searchIndex]}"`}
+              className="w-full px-4 py-2 rounded-lg text-black outline-none"
+            />
+
           </div>
 
-        )}
+        </div>
 
-      </div>
+        <div className="flex gap-4 items-center">
 
-      {/* RIGHT */}
+          {token && (
 
-      <div className="flex gap-4 items-center">
+            <Link to="/cart">
 
-        {/* <Link to="/">Home</Link> */}
+              {cartCount === 0 ? (
 
-        {token && (
-          <>
-            <Link to="/orders">Orders</Link>
-            <Link to="/cart">Cart ({cartCount})</Link>
-          </>
-        )}
+                <div className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2">
+                  🛒 My Cart
+                </div>
 
-        {role === "ADMIN" && (
-          <>
-            <Link to="/admin/products">Products</Link>
-            <Link to="/admin/orders">Admin Orders</Link>
-            <Link to="/admin/stores">Stores</Link>
-          </>
-        )}
+              ) : (
 
-        {!token && (
+                <div className="bg-green-800 px-4 py-2 rounded-xl flex items-center gap-3">
 
-          <button
-            onClick={()=>setShowLogin(true)}
-            className="bg-white text-green-600 px-3 py-1 rounded"
-          >
-            Login
-          </button>
+                  <span>🛒</span>
 
-        )}
+                  <div className="flex flex-col">
 
-        {token && (
+                    <span>{cartCount} items</span>
 
-          <button
-            onClick={logout}
-            className="bg-white text-green-600 px-3 py-1 rounded"
-          >
-            Logout
-          </button>
+                    <span className="text-sm">
+                      ₹{cartTotal}
+                    </span>
 
-        )}
+                  </div>
+
+                </div>
+
+              )}
+
+            </Link>
+
+          )}
+
+          {!token && (
+
+            <button
+              onClick={()=>setShowLogin(true)}
+              className="bg-white text-green-700 px-4 py-2 rounded-lg font-semibold"
+            >
+              Login
+            </button>
+
+          )}
+
+          {token && (
+
+            <div ref={accountRef} className="relative">
+
+              <button
+                onClick={()=>setAccountOpen(!accountOpen)}
+                className="bg-white text-green-700 px-4 py-2 rounded-lg font-semibold"
+              >
+                Account ▼
+              </button>
+
+              {accountOpen && (
+
+                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg">
+
+                  <Link
+                    to="/orders"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    Orders
+                  </Link>
+
+                  {role === "ADMIN" && (
+
+                    <>
+                      <Link
+                        to="/admin/orders"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                      >
+                        Admin Orders
+                      </Link>
+
+                      <Link
+                        to="/admin/products"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                      >
+                        Products
+                      </Link>
+
+                      <Link
+                        to="/admin/stores"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                      >
+                        Stores
+                      </Link>
+                    </>
+
+                  )}
+
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+
+                </div>
+
+              )}
+
+            </div>
+
+          )}
+
+        </div>
 
       </div>
 
@@ -172,6 +278,7 @@ function Navbar() {
     </div>
 
   )
+
 }
 
 export default Navbar

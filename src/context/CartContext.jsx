@@ -5,37 +5,51 @@ export const CartContext = createContext()
 
 export function CartProvider({ children }) {
 
-  const [cartCount, setCartCount] = useState(0)
+const [cartCount, setCartCount] = useState(0)
+const [cartTotal, setCartTotal] = useState(0)
 
-  const addToCart = async (product) => {
+const addToCart = async (product) => {
 
-    await axios.post("/cart/add", {
-      productId: product.id,
-      quantity: 1
-    })
+await axios.post("/cart/add", {
+  productId: product.id,
+  quantity: 1
+})
 
-    setCartCount((prev) => prev + 1)
-  }
+setCartCount(prev => prev + 1)
+setCartTotal(prev => prev + product.price)
 
-  const reduceFromCart = async (product) => {
+}
 
-    await axios.patch("/cart/reduce", {
-      productId: product.id,
-      quantity: 1
-    })
+const reduceFromCart = async (product) => {
 
-    setCartCount((prev) => (prev > 0 ? prev - 1 : 0))
-  }
+await axios.patch("/cart/reduce", {
+  productId: product.id,
+  quantity: 1
+})
 
-  return (
-    <CartContext.Provider
-      value={{
-        cartCount,
-        addToCart,
-        reduceFromCart
-      }}
-    >
-      {children}
-    </CartContext.Provider>
-  )
+setCartCount(prev => (prev > 0 ? prev - 1 : 0))
+setCartTotal(prev => (prev - product.price >= 0 ? prev - product.price : 0))
+
+
+}
+
+const clearCart = () => {
+setCartCount(0)
+setCartTotal(0)
+}
+
+return (
+<CartContext.Provider
+value={{
+cartCount,
+cartTotal,
+addToCart,
+reduceFromCart,
+clearCart
+}}
+>
+{children}
+</CartContext.Provider>
+)
+
 }

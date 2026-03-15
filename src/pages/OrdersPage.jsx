@@ -23,58 +23,102 @@ function OrdersPage() {
   }, [])
 
   const loadOrders = async () => {
+
     try {
+
       const data = await getOrders()
       setOrders(data)
+
     } catch (error) {
+
       console.error("Error loading orders", error)
+
     }
+
   }
 
   return (
-    <div>
 
-      <h2>My Orders</h2>
+    <div className="max-w-5xl mx-auto px-6 py-8">
+
+      <h1 className="text-2xl font-bold mb-6">
+        My Orders
+      </h1>
 
       {orders.length === 0 ? (
-        <p>No orders yet</p>
+
+        <div className="bg-white p-8 rounded-xl shadow text-center">
+
+          <p className="text-gray-500">
+            No orders yet
+          </p>
+
+        </div>
+
       ) : (
-        orders.map(order => {
 
-          const total = order.items.reduce(
-            (sum, item) => sum + item.price * item.quantity,
-            0
-          )
+        <div className="space-y-4">
 
-          return (
-            <div
-              key={order.id}
-              style={{
-                border: "1px solid gray",
-                padding: "10px",
-                margin: "10px"
-              }}
-            >
+          {orders.map(order => {
 
-              <h4>Order #{order.id}</h4>
+            const total = order.items.reduce(
+              (sum, item) => sum + item.price * item.quantity,
+              0
+            )
 
-              <p>Status: {order.status}</p>
+            return (
 
-              {order.items.map(item => (
-                <div key={item.productId}>
-                  {item.productName} × {item.quantity}
+              <div
+                key={order.id}
+                className="bg-white p-6 rounded-xl shadow"
+              >
+
+                <div className="flex justify-between items-center mb-3">
+
+                  <h3 className="font-semibold">
+                    Order #{order.id}
+                  </h3>
+
+                  <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full">
+                    {order.status}
+                  </span>
+
                 </div>
-              ))}
 
-              <h3>Total: ₹{total}</h3>
+                <div className="text-gray-700 space-y-1 mb-3">
 
-            </div>
-          )
-        })
+                  {order.items.map(item => (
+
+                    <div key={item.productId}>
+
+                      {item.productName} × {item.quantity}
+
+                    </div>
+
+                  ))}
+
+                </div>
+
+                <div className="font-semibold">
+
+                  Total: ₹{total}
+
+                </div>
+
+              </div>
+
+            )
+
+          })}
+
+        </div>
+
       )}
 
     </div>
+
   )
+
 }
 
 export default OrdersPage

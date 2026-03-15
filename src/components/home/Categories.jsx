@@ -1,5 +1,6 @@
 const categories = [
 
+  { name: "All", emoji: "🛒" },
   { name: "Dairy", emoji: "🥛" },
   { name: "Fruits", emoji: "🍎" },
   { name: "Snacks", emoji: "🍪" },
@@ -11,7 +12,7 @@ const categories = [
 
 ]
 
-function Categories() {
+function Categories({ selectedCategory, setSelectedCategory }) {
 
   return (
 
@@ -23,11 +24,19 @@ function Categories() {
 
       <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
 
-        {categories.map((cat, index) => (
+        {categories.map((cat) => (
 
           <div
-            key={index}
-            className="bg-white shadow rounded-xl p-4 text-center cursor-pointer hover:shadow-md"
+            key={cat.name}
+            onClick={() => setSelectedCategory(cat.name)}
+            className={`bg-white shadow rounded-xl p-4 text-center cursor-pointer hover:shadow-md transition
+
+              ${selectedCategory === cat.name
+                ? "border-2 border-green-600"
+                : ""
+              }
+
+            `}
           >
 
             <div className="text-3xl mb-2">

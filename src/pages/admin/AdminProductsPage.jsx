@@ -12,14 +12,15 @@ export default function AdminProductsPage() {
   const [price, setPrice] = useState("")
   const [stock, setStock] = useState("")
   const [imageUrl, setImageUrl] = useState("")
+  const [category, setCategory] = useState("")
+
+  const [editingId, setEditingId] = useState(null)
 
   const fetchProducts = async () => {
 
     if (!selectedStore) return
 
-    const res = await axios.get(
-      `/admin/products?storeId=${selectedStore.id}`
-    )
+    const res = await axios.get(`/admin/products?storeId=${selectedStore.id}`)
 
     setProducts(res.data.content || res.data)
   }
@@ -32,9 +33,20 @@ export default function AdminProductsPage() {
 
   }, [selectedStore])
 
+  const resetForm = () => {
+
+    setName("")
+    setPrice("")
+    setStock("")
+    setImageUrl("")
+    setCategory("")
+    setEditingId(null)
+
+  }
+
   const createProduct = async () => {
 
-    if (!name || !price || !stock) {
+    if (!name || !price || !stock || !category) {
       alert("Fill all fields")
       return
     }
@@ -44,15 +56,39 @@ export default function AdminProductsPage() {
       price,
       stock,
       imageUrl,
+      category,
       storeId: selectedStore.id
     })
 
-    setName("")
-    setPrice("")
-    setStock("")
-    setImageUrl("")
-
+    resetForm()
     fetchProducts()
+  }
+
+  const updateProduct = async () => {
+
+    await axios.put(`/admin/products/${editingId}`, {
+      name,
+      price,
+      stock,
+      imageUrl,
+      category,
+      storeId: selectedStore.id
+    })
+
+    resetForm()
+    fetchProducts()
+  }
+
+  const startEdit = (product) => {
+
+    setEditingId(product.id)
+
+    setName(product.name)
+    setPrice(product.price)
+    setStock(product.stock)
+    setImageUrl(product.imageUrl)
+    setCategory(product.category)
+
   }
 
   const deleteProduct = async (id) => {
@@ -92,19 +128,19 @@ export default function AdminProductsPage() {
         Store: <b>{selectedStore?.name}</b>
       </div>
 
-      {/* Add Product */}
+      {/* PRODUCT FORM */}
 
-      <div className="flex gap-2 mb-6">
+      <div className="grid grid-cols-6 gap-3 mb-6">
 
         <input
-          className="border p-2"
+          className="border p-2 rounded"
           placeholder="Product Name"
           value={name}
           onChange={(e)=>setName(e.target.value)}
         />
 
         <input
-          className="border p-2"
+          className="border p-2 rounded"
           placeholder="Price"
           type="number"
           value={price}
@@ -112,7 +148,7 @@ export default function AdminProductsPage() {
         />
 
         <input
-          className="border p-2"
+          className="border p-2 rounded"
           placeholder="Stock"
           type="number"
           value={stock}
@@ -120,34 +156,74 @@ export default function AdminProductsPage() {
         />
 
         <input
-          className="border p-2"
+          className="border p-2 rounded"
           placeholder="Image URL"
           value={imageUrl}
           onChange={(e)=>setImageUrl(e.target.value)}
         />
 
-        <button
-          onClick={createProduct}
-          className="bg-green-600 text-white px-4 py-2 rounded"
+        <select
+          className="border p-2 rounded"
+          value={category}
+          onChange={(e)=>setCategory(e.target.value)}
         >
-          Add Product
-        </button>
+          <option value="">Category</option>
+          <option value="Dairy">Dairy</option>
+          <option value="Fruits">Fruits</option>
+          <option value="Snacks">Snacks</option>
+          <option value="Drinks">Drinks</option>
+          <option value="Bakery">Bakery</option>
+          <option value="Vegetables">Vegetables</option>
+          <option value="Ice Cream">Ice Cream</option>
+          <option value="Meat">Meat</option>
+        </select>
+
+        <div className="flex gap-2">
+
+          <button
+            onClick={editingId ? updateProduct : createProduct}
+            className="bg-green-600 text-white px-4 py-2 rounded"
+          >
+            {editingId ? "Update" : "Add"}
+          </button>
+
+          {editingId && (
+
+            <button
+              onClick={resetForm}
+              className="bg-gray-400 text-white px-4 py-2 rounded"
+            >
+              Cancel
+            </button>
+
+          )}
+
+        </div>
 
       </div>
 
-      {/* Products Table */}
+      {/* PRODUCT TABLE */}
 
-      <table className="w-full border">
+      <table className="w-full border border-gray-200 text-sm">
 
-        <thead className="bg-gray-100">
+        <thead className="bg-gray-100 text-gray-700">
 
           <tr>
-            <th className="p-2">ID</th>
-            <th className="p-2">Image</th>
-            <th className="p-2">Name</th>
-            <th className="p-2">Price</th>
-            <th className="p-2">Stock</th>
-            <th className="p-2">Actions</th>
+
+            <th className="p-3 text-center">ID</th>
+
+            <th className="p-3 text-center">Image</th>
+
+            <th className="p-3 text-left">Name</th>
+
+            <th className="p-3 text-left">Category</th>
+
+            <th className="p-3 text-center">Price</th>
+
+            <th className="p-3 text-center">Stock</th>
+
+            <th className="p-3 text-center">Actions</th>
+
           </tr>
 
         </thead>
@@ -156,48 +232,65 @@ export default function AdminProductsPage() {
 
           {products.map(p => (
 
-            <tr key={p.id} className="border-t">
+            <tr key={p.id} className="border-t hover:bg-gray-50">
 
-              <td className="p-2">{p.id}</td>
+              <td className="p-3 text-center">{p.id}</td>
 
-              <td className="p-2">
+              <td className="p-3 text-center">
+
                 {p.imageUrl && (
+
                   <img
                     src={p.imageUrl}
                     alt={p.name}
-                    className="w-12 h-12 object-cover"
+                    className="w-12 h-12 object-cover rounded-md mx-auto"
                   />
+
                 )}
+
               </td>
 
-              <td className="p-2">{p.name}</td>
+              <td className="p-3 font-medium">{p.name}</td>
 
-              <td className="p-2">₹{p.price}</td>
+              <td className="p-3">{p.category}</td>
 
-              <td className="p-2">{p.stock}</td>
+              <td className="p-3 text-center font-semibold">₹{p.price}</td>
 
-              <td className="p-2 flex gap-2">
+              <td className="p-3 text-center">{p.stock}</td>
 
-                <button
-                  onClick={()=>increaseStock(p.id)}
-                  className="bg-blue-500 text-white px-2 py-1 rounded"
-                >
-                  +
-                </button>
+              <td className="p-3">
 
-                <button
-                  onClick={()=>decreaseStock(p.id)}
-                  className="bg-yellow-500 text-white px-2 py-1 rounded"
-                >
-                  -
-                </button>
+                <div className="flex justify-center gap-2">
 
-                <button
-                  onClick={()=>deleteProduct(p.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                >
-                  Delete
-                </button>
+                  <button
+                    onClick={()=>increaseStock(p.id)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                  >
+                    +
+                  </button>
+
+                  <button
+                    onClick={()=>decreaseStock(p.id)}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                  >
+                    -
+                  </button>
+
+                  <button
+                    onClick={()=>startEdit(p)}
+                    className="bg-purple-500 text-white px-3 py-1 rounded"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={()=>deleteProduct(p.id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded"
+                  >
+                    Delete
+                  </button>
+
+                </div>
 
               </td>
 
@@ -210,5 +303,7 @@ export default function AdminProductsPage() {
       </table>
 
     </div>
+
   )
+
 }

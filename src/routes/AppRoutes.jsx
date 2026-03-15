@@ -13,31 +13,33 @@ import RegisterPage from "../pages/RegisterPage"
 
 function AppRoutes() {
 
-  return (
+return (
 
-    <Routes>
 
-      <Route path="/" element={<HomePage />} />
+<Routes>
 
-      <Route path="/cart" element={<CartPage />} />
+  <Route path="/" element={<HomePage key="home" />} />
 
-      <Route path="/orders" element={<OrdersPage />} />
+  <Route path="/cart" element={<CartPage key="cart" />} />
 
-      <Route path="/login" element={<LoginPage />} />
+  <Route path="/orders" element={<OrdersPage key="orders" />} />
 
-      <Route path="/order-success" element={<OrderSuccessPage />} />
+  <Route path="/login" element={<LoginPage key="login" />} />
 
-      <Route path="/admin/products" element={<AdminProductsPage />} />
+  <Route path="/order-success" element={<OrderSuccessPage key="success" />} />
 
-      <Route path="/admin/orders" element={<AdminOrdersPage />} />
+  <Route path="/admin/products" element={<AdminProductsPage key="admin-products" />} />
 
-      <Route path="/admin/stores" element={<AdminStoresPage />} />
+  <Route path="/admin/orders" element={<AdminOrdersPage key="admin-orders" />} />
 
-      <Route path="/register" element={<RegisterPage />} />
+  <Route path="/admin/stores" element={<AdminStoresPage key="admin-stores" />} />
 
-    </Routes>
+  <Route path="/register" element={<RegisterPage key="register" />} />
 
-  )
+</Routes>
+
+
+)
 
 }
 
