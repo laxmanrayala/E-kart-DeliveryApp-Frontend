@@ -1,16 +1,63 @@
-# React + Vite
+# 🛒 E-Kart Frontend (React)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend UI for the E-Kart application.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ⚙️ Tech Stack
 
-## React Compiler
+- React
+- Tailwind CSS
+- Axios
+- Context API
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🚀 Run Locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+npm install  
+npm run dev
+
+---
+
+## 🌐 App URL
+
+http://localhost:5173 (allowed cors in security config)
+
+---
+
+## 🔗 Backend Connection
+
+Update API base URL:
+
+http://localhost:8080
+
+---
+
+## 📦 Features
+
+- Store selection
+- Product browsing
+- Add to cart
+- Real-time cart UI
+- Checkout flow
+- Order history
+- Admin dashboard
+
+---
+
+## 🧠 Notes
+
+- Backend must be running before using frontend
+- Make sure correct API URL is configured
+
+---
+
+## Result
+
+<img width="1280" height="646" alt="Screenshot 2026-03-19 at 12 29 47 PM" src="https://github.com/user-attachments/assets/cce8fac2-d27f-4824-ad43-6e8902f80c86" />
+
+
+## 👨‍💻 Author
+
+Laxman Rayala
